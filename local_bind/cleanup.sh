@@ -12,10 +12,6 @@ ZONE_SERIAL=$(cat ${ZONE_FILE} | grep '; serial number of this zone file$' | awk
 ZONE_SERIAL_DATE=${ZONE_SERIAL:0:8}
 ZONE_SERIAL_INCREMENT=${ZONE_SERIAL:8:2}
 
-echo "serial: ${ZONE_SERIAL}"
-echo "serial date: ${ZONE_SERIAL_DATE}"
-echo "serial increment: ${ZONE_SERIAL_INCREMENT}"
-
 if [ "${ZONE_SERIAL_DATE}" = "${CURRENT_DATE}" ]; then
   NEW_INCREMENT=$((${ZONE_SERIAL_INCREMENT} + 1))
   # we limit to increment 98 because we need 2 changes to first add the challenge, then cleanup
@@ -28,8 +24,6 @@ else
 fi
 
 NEW_SERIAL=$(printf "${CURRENT_DATE}%02d" ${NEW_INCREMENT})
-
-echo "New serial: ${NEW_SERIAL}"
 
 echo "Freeze zone"
 rndc freeze ${CERTBOT_DOMAIN}
