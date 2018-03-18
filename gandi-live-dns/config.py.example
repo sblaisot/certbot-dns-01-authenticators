@@ -1,0 +1,24 @@
+
+# This is the liveDNS api from gandi. You usually don't need to modify this
+
+livedns_api = "https://dns.api.gandi.net/api/v5/"
+
+# Your liveDNS api key. It can be generated in gandi manager by
+# clicking on your name (top right), then "parameters",
+# then "Change password and manage access restrictions"
+
+livedns_apikey = "YOUR-KEY-HERE"
+
+
+# Your LiveDNS api sharing_id if you use an organization
+# When managing objects (like domains and zones) under an organization,
+# these objects are not directly accessible under your user
+# so you have to use a sharing_id to access the objects within the
+# organization
+# You can find it in the URL of the manager and it is a guid in the form:
+# e2f9927a-ebc9-44d4-bd00-af51f8327ec2
+# Set it to None if the domains you manage are directly under your user
+# and you don't use an organization
+
+#livedns_sharing_id="e2f9927a-ebc9-44d4-bd00-af51f8327ec2"
+livedns_sharing_id = None

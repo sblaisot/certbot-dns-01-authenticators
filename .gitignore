@@ -1,0 +1,7 @@
+# Configuration files containing credentials
+config.py
+
+# Python Byte-compiled / optimized / DLL files
+*.py[cod]
+__pycache__/
+*$py.class
