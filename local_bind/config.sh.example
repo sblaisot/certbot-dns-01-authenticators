@@ -7,3 +7,8 @@ ZONEFILE_DIR=/etc/bind/zones
 # Use %s as domain name
 
 ZONEFILE_FILENAME_FORMAT="db.%s"
+
+# Serial line comment in zone file.
+# It will be used to search serial line in the zone file
+
+SERIAL_COMMENT_STRING="serial number of this zone file"

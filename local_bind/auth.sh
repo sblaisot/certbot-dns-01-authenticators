@@ -32,7 +32,7 @@ if [ ! -f ${ZONE_FILE} ]; then
 fi
 
 CURRENT_DATE=$(date +%Y%m%d)
-ZONE_SERIAL=$(cat ${ZONE_FILE} | grep '; serial number of this zone file$' | awk '{ print $1 }')
+ZONE_SERIAL=$(grep "${SERIAL_COMMENT_STRING}" ${ZONE_FILE} | awk '{ print $1 }')
 ZONE_SERIAL_DATE=${ZONE_SERIAL:0:8}
 ZONE_SERIAL_INCREMENT=${ZONE_SERIAL:8:2}
 
@@ -53,7 +53,7 @@ echo "Freeze zone"
 rndc freeze ${CERTBOT_DOMAIN}
 
 echo "Update serial"
-sed -i -e 's/^.*\; serial number of this zone file$/                        '${NEW_SERIAL}'      ; serial number of this zone file/' ${ZONE_FILE}
+sed -i -re 's/^([^0-9]*)([0-9]+)([^0-9]*)('"${SERIAL_COMMENT_STRING}"')(.*)$/\1'${NEW_SERIAL}'\3\4\5/' ${ZONE_FILE}
 
 echo "Add challenge to zone file"
 echo "_acme-challenge		IN	TXT	${CERTBOT_VALIDATION}" >> ${ZONE_FILE}
