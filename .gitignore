@@ -1,5 +1,6 @@
 # Configuration files containing credentials
 config.py
+config.sh
 
 # Python Byte-compiled / optimized / DLL files
 *.py[cod]
