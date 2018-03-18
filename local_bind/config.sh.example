@@ -1,0 +1,9 @@
+# Where to find zone files
+
+ZONEFILE_DIR=/etc/bind/zones
+
+
+# Zone file filename format
+# Use %s as domain name
+
+ZONEFILE_FILENAME_FORMAT="db.%s"

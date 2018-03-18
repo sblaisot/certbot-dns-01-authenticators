@@ -13,7 +13,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-ZONE_FILE=/etc/bind/zones/db.${CERTBOT_DOMAIN}
+BASEDIR=$(dirname $0)
+
+if [ ! -r ${BASEDIR}/config.sh ]; then
+  echo "***ERROR: Config file ${BASEDIR}/config.sh not found"
+  exit 1
+fi
+
+source ${BASEDIR}/config.sh
+
+ZONEFILE_FILENAME=$(printf ${ZONEFILE_FILENAME_FORMAT} ${CERTBOT_DOMAIN})
+
+ZONE_FILE="${ZONEFILE_DIR}/${ZONEFILE_FILENAME}"
 
 if [ ! -f ${ZONE_FILE} ]; then
   echo "***ERROR: zone file ${ZONE_FILE} not found"
