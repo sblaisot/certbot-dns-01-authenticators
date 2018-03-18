@@ -61,7 +61,4 @@ sed -i -e '/^_acme-challenge\s/d' ${ZONE_FILE}
 echo "Release zone"
 rndc thaw ${CERTBOT_DOMAIN}
 
-echo "Wait 5 seconds for repplication to masters"
-sleep 5
-
 echo "Done"
