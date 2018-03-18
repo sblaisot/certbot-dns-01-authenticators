@@ -22,7 +22,7 @@ $ certbot certonly \
 
   * This scripts expects to find all zone files in the same directory and
     with the same filename format (configurable)
-  * The sone file must contain the serial alone on its line with a comment
+  * The zone file must contain the serial alone on its line with a comment
     allowing this script to find it. For example you can use a definition
     in the form:
 
