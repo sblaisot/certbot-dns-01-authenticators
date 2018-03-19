@@ -12,6 +12,7 @@ The following scripts are included in this repository:
   * [`test`](test): scripts for testing purposes only, it doesn't validate anything but instead prints the various environment variable certbot passes to him.
   * [`local-bind`](local-bind): To manage DNS zones when the bind zone file is directly accessible on the same machine (server being DNS master and web server simultaneously)
   * [`gandi-livedns`](gandi-livedns): To be used when your DNS provider is gandi (only for domains migrated to Gandi's liveDNS service)
+  * [`ovh`](ovh): To be used when your DNS provider is OVH.
 
 ## Installation
 
