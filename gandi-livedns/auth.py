@@ -24,7 +24,7 @@ pp = pprint.PrettyPrinter(indent=4)
 
 certbot_domain = os.environ.get("CERTBOT_DOMAIN")
 try:
-    cerbot_domain
+    certbot_domain
 except NameError:
     print("CERTBOT_DOMAIN environment variable is missing, exiting")
     exit(1)
