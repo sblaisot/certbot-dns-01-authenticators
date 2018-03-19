@@ -33,7 +33,7 @@ certbot_validation = os.environ.get("CERTBOT_VALIDATION")
 try:
     certbot_validation
 except NameError:
-    print("CERTBOT_DOMAIN environment variable is missing, exiting")
+    print("CERTBOT_VALIDATION environment variable is missing, exiting")
     exit(1)
 
 if livedns_sharing_id == None:
