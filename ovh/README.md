@@ -21,7 +21,7 @@ Copy `ovh.conf.example` to `ovh.conf` and adjust it to suit your needs
 
 ```
 $ certbot certonly \
-  -- manual \
+  --manual \
   --manual-auth-hook /opt/le-scripts/ovh/auth.py \
   --manual-cleanup-hook /opt/le-scripts/ovh/cleanup.sh \
   -d '*.domain.tld'
