@@ -116,7 +116,7 @@ print("Waiting for record to be available on DNS servers")
 
 while elapsed < wait_timeout :
     try:
-        myAnswers = myResolver.query("_acme-challenge.mycozycloud.com", "TXT")
+        myAnswers = myResolver.query("_acme-challenge." + certbot_domain, "TXT")
         break
     except:
         pass
