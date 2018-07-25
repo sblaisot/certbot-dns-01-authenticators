@@ -21,25 +21,25 @@ import os
 
 pp = pprint.PrettyPrinter(indent=4)
 
-certbot_domain = os.environ.get("CERTBOT_DOMAIN")
+certbot_domain = os.environ.get('CERTBOT_DOMAIN')
 try:
     certbot_domain
 except NameError:
-    print("***ERROR: CERTBOT_DOMAIN environment variable is missing, exiting")
+    print('***ERROR: CERTBOT_DOMAIN environment variable is missing, exiting')
     exit(1)
 
-certbot_validation = os.environ.get("CERTBOT_VALIDATION")
+certbot_validation = os.environ.get('CERTBOT_VALIDATION')
 try:
     certbot_validation
 except NameError:
-    print("***ERROR: CERTBOT_VALIDATION environment variable is missing, exiting")
+    print('***ERROR: CERTBOT_VALIDATION environment variable missing, exiting')
     exit(1)
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 config_file = script_dir + "/ovh.conf"
 
 if not os.path.exists(config_file):
-    print("***ERROR: config file not found")
+    print('***ERROR: config file not found')
     exit(1)
 
 # Instanciate an OVH Client.
@@ -50,34 +50,36 @@ client = ovh.Client(config_file=config_file)
 result = client.get('/domain/zone/')
 
 if certbot_domain not in result:
-    print("***ERROR: The requested domain " + certbot_domain + " was not found in this ovh account")
+    print('***ERROR: The requested domain {} was not found in this ovh account'
+          .format(certbot_domain))
     exit(1)
 
 # Look for existing _acme-challenge record
 result = client.get('/domain/zone/' + certbot_domain + '/record',
-    fieldType='TXT',
-    subDomain='_acme-challenge',
-)
+                    fieldType='TXT',
+                    subDomain='_acme-challenge',
+                    )
 
 if len(result) == 0:
-    print("***ERROR: Existing _acme-challenge record not found, exiting")
+    print('***ERROR: Existing _acme-challenge record not found, exiting')
     exit(1)
 
 record_id = result[0]
 
-result = client.delete('/domain/zone/' + certbot_domain + '/record/' + str(record_id))
+result = client.delete('/domain/zone/{}/record/{}'
+                       .format(certbot_domain, str(record_id)))
 
 if result is not None:
-    print("***ERROR: something went wrong when removing DNS record")
+    print('***ERROR: something went wrong when removing DNS record')
     pp.pprint(result)
     exit(1)
 
 
-result=client.post('/domain/zone/' + certbot_domain + '/refresh')
+result = client.post('/domain/zone/{}/refresh'.format(certbot_domain))
 
 if result is not None:
-    print("***ERROR: something went wrong when refreshing DNS zone")
+    print('***ERROR: something went wrong when refreshing DNS zone')
     pp.pprint(result)
     exit(1)
 else:
-    print("All good, DNS record deleted")
+    print('All good, DNS record deleted')

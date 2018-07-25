@@ -20,8 +20,8 @@ import dns.resolver
 import os
 import time
 
-wait_timeout = 180 # timeour in seconds
-wait_loop_step = 2 # seconds between 2 checks
+wait_timeout = 180  # timeour in seconds
+wait_loop_step = 2  # seconds between 2 checks
 
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -36,11 +36,11 @@ certbot_validation = os.environ.get("CERTBOT_VALIDATION")
 try:
     certbot_validation
 except NameError:
-    print("***ERROR: CERTBOT_VALIDATION environment variable is missing, exiting")
+    print('***ERROR: CERTBOT_VALIDATION environment variable missing, exiting')
     exit(1)
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
-config_file = script_dir + "/ovh.conf"
+config_file = '{}/ovh.conf'.format(script_dir)
 
 if not os.path.exists(config_file):
     print("***ERROR: config file not found")
@@ -54,10 +54,11 @@ client = ovh.Client(config_file=config_file)
 result = client.get('/domain/zone/')
 
 if certbot_domain not in result:
-    print("***ERROR: The requested domain " + certbot_domain + " was not found in this ovh account")
+    print('***ERROR: The requested domain {} was not found in this ovh account'
+          .format(certbot_domain))
     exit(1)
 
-result = client.get('/domain/zone/'+ certbot_domain)
+result = client.get('/domain/zone/{}'.format(certbot_domain))
 
 domain_nameservers = result['nameServers']
 
@@ -74,21 +75,21 @@ for nameserver in domain_nameservers:
         IP_nameservers.append(str(rdata))
 
 # Look for existing _acme-challenge record
-result = client.get('/domain/zone/' + certbot_domain + '/record',
-    fieldType='TXT',
-    subDomain='_acme-challenge',
-)
+result = client.get('/domain/zone/{}/record'.format(certbot_domain),
+                    fieldType='TXT',
+                    subDomain='_acme-challenge',
+                    )
 
 if len(result) > 0:
     print("***ERROR: Existing _acme-challenge record found, exiting")
     exit(1)
 
 result = client.post('/domain/zone/' + certbot_domain + '/record',
-    fieldType='TXT',
-    subDomain='_acme-challenge',
-    target=certbot_validation,
-    ttl=300,
-)
+                     fieldType='TXT',
+                     subDomain='_acme-challenge',
+                     target=certbot_validation,
+                     ttl=300,
+                     )
 
 try:
     result['id']
@@ -97,7 +98,7 @@ except:
     pp.pprint(result)
     exit(1)
 
-result=client.post('/domain/zone/' + certbot_domain + '/refresh')
+result = client.post('/domain/zone/' + certbot_domain + '/refresh')
 
 if result is None:
     print("All good, DNS record created")
@@ -106,17 +107,19 @@ else:
     pp.pprint(result)
     exit(1)
 
-# Now we loop requesting the zone DNS servers waiting for the record to be available
+# Now we loop requesting the zone DNS servers
+# waiting for the record to be available
 myResolver = dns.resolver.Resolver(configure=False)
 myResolver.nameservers = IP_nameservers
 
-elapsed = 0;
+elapsed = 0
 
 print("Waiting for record to be available on DNS servers")
 
-while elapsed < wait_timeout :
+while elapsed < wait_timeout:
     try:
-        myAnswers = myResolver.query("_acme-challenge.mycozycloud.com", "TXT")
+        myAnswers = myResolver.query('_acme-challenge.{}'
+                                     .format(certbot_domain), "TXT")
         break
     except:
         pass
@@ -126,7 +129,8 @@ while elapsed < wait_timeout :
         print(str(elapsed) + " seconds elapsed, still waiting...")
 
 if elapsed >= wait_timeout:
-    print("***ERROR: DNS record still not available on DNS servers after waiting for " + str(elapsed) + " seconds")
+    print('***ERROR: DNS record still not available on DNS servers '
+          'after waiting for {} seconds'.format(str(elapsed)))
     exit(1)
 else:
     print("DNS record available on DNS server")
