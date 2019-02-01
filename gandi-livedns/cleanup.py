@@ -45,6 +45,16 @@ headers = {
     'X-Api-Key': livedns_apikey,
 }
 
+top_domain = certbot_domain
+sub_domain = ""
+
+while top_domain.count('.') > 1:
+    index = top_domain.find('.')
+    sub_domain = sub_domain + top_domain[:index]
+    top_domain = top_domain[(index+1):]
+
+
+
 response = requests.get(livedns_api + "domains" + sharing_param, headers=headers)
 
 if (response.ok):
@@ -53,7 +63,7 @@ else:
     response.raise_for_status()
     exit(1)
 
-domain_index = next((index for (index, d) in enumerate(domains) if d["fqdn"] == certbot_domain), None)
+domain_index = next((index for (index, d) in enumerate(domains) if d["fqdn"] == top_domain), None)
 
 if domain_index == None:
     # domain not found
@@ -62,7 +72,11 @@ if domain_index == None:
 
 domain_records_href = domains[domain_index]["domain_records_href"]
 
-response = requests.get(domain_records_href + "/_acme-challenge" + sharing_param, headers=headers)
+rrset_name = "_acme-challenge"
+if len(sub_domain):
+    rrset_name = rrset_name + "." + sub_domain
+
+response = requests.get(domain_records_href + "/" + rrset_name + sharing_param, headers=headers)
 
 if (response.ok):
     domains = response.json()
@@ -76,7 +90,7 @@ else:
     response.raise_for_status()
     exit(1)
 
-response = requests.delete(domain_records_href + "/_acme-challenge/TXT" + sharing_param, headers=headers)
+response = requests.delete(domain_records_href + "/" + rrset_name + "/TXT" + sharing_param, headers=headers)
 
 if (response.ok):
     print("all good, entry deleted")
