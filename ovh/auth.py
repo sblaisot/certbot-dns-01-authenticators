@@ -19,6 +19,7 @@ import ovh
 import dns.resolver
 import os
 import time
+import string
 
 wait_timeout = 180  # timeour in seconds
 wait_loop_step = 2  # seconds between 2 checks
@@ -32,7 +33,7 @@ except NameError:
     print("***ERROR: CERTBOT_DOMAIN environment variable is missing, exiting")
     exit(1)
 
-certbot_validation = os.environ.get("CERTBOT_VALIDATION")
+certbot_validation = os.environ.get("CERTBOT_VALIDATION").strip()
 try:
     certbot_validation
 except NameError:
@@ -80,9 +81,17 @@ result = client.get('/domain/zone/{}/record'.format(certbot_domain),
                     subDomain='_acme-challenge',
                     )
 
-if len(result) > 0:
-    print("***ERROR: Existing _acme-challenge record found, exiting")
-    exit(1)
+# This cript can be run multiple time on the same domain :
+# domain.tld and *.domain.tld is the most obvious use case
+# There will be 2 TXT record for the same key, which is OK
+# but we need to be sure we check the one we adde dwith the
+# right certbot_validation of this run.
+for recordid in result:
+    record = client.get('/domain/zone/{}/record/{}'.format(certbot_domain,
+                    recordid), fieldType='TXT', subDomain='_acme-challenge')
+    if record['target'] == certbot_validation:
+        print("***ERROR: Existing _acme-challenge record found, exiting")
+        exit(1)
 
 result = client.post('/domain/zone/' + certbot_domain + '/record',
                      fieldType='TXT',
@@ -116,12 +125,20 @@ elapsed = 0
 
 print("Waiting for record to be available on DNS servers")
 
-while elapsed < wait_timeout:
+recordfound=False
+while elapsed < wait_timeout and not recordfound:
     try:
+        print("querrying DNS")
         myAnswers = myResolver.query('_acme-challenge.{}'
                                      .format(certbot_domain), "TXT")
-        break
-    except:
+        # As we can have multiple challenges for a single domain, check
+        # for the specific one we added
+        for rdata in myAnswers:
+            for txt in rdata.strings:
+                txtclean=txt.decode("ascii").strip()
+                if txtclean == certbot_validation:
+                    recordfound=True
+    except dns.exception.DNSException as e:
         pass
     time.sleep(wait_loop_step)
     elapsed += wait_loop_step

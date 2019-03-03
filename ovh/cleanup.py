@@ -62,7 +62,8 @@ result = client.get('/domain/zone/' + certbot_domain + '/record',
 
 if len(result) == 0:
     print('***ERROR: Existing _acme-challenge record not found, exiting')
-    exit(1)
+    exit(0) # due to possible multi-domain gotcha i'm unsure if we should
+            # exit with an error
 
 record_id = result[0]
 
